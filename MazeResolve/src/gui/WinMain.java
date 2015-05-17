@@ -37,15 +37,30 @@ public class WinMain extends javax.swing.JFrame {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
-        l_img = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         bAbrir = new javax.swing.JButton();
         b_solucion = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("MazeResolve v.023");
 
-        l_img.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                jPanel1ComponentResized(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 480, Short.MAX_VALUE)
+        );
 
         bAbrir.setText("Abrir");
         bAbrir.addActionListener(new java.awt.event.ActionListener() {
@@ -61,8 +76,6 @@ public class WinMain extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Puntos");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -70,26 +83,24 @@ public class WinMain extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(l_img, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(bAbrir)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(b_solucion))
-                    .addComponent(jButton1))
-                .addContainerGap(473, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(b_solucion)
+                        .addGap(0, 534, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(l_img, javax.swing.GroupLayout.PREFERRED_SIZE, 315, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bAbrir)
                     .addComponent(b_solucion))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1)
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addGap(14, 14, 14))
         );
 
         pack();
@@ -100,9 +111,10 @@ public class WinMain extends javax.swing.JFrame {
         if(jFileChooser1.showOpenDialog(this) == JFileChooser.APPROVE_OPTION){
             File f = jFileChooser1.getSelectedFile();
             try {
-                imgCargada = ImageIO.read(f);
-                ImageIcon im = new ImageIcon(imgCargada);
-                l_img.setIcon(new ImageIcon(im.getImage().getScaledInstance(l_img.getWidth(), l_img.getHeight(), Image.SCALE_DEFAULT)));
+                //Cargar Imagen
+                panelImg.imagen = ImageIO.read(f);
+                panelImg.updateUI();
+                
             } catch (IOException ex) {
                 Logger.getLogger(WinMain.class.getName()).log(Level.SEVERE, null, ex);
                 JOptionPane.showMessageDialog(this, "No se pudo cargar la imagen", "Error", JOptionPane.ERROR_MESSAGE);
@@ -111,30 +123,39 @@ public class WinMain extends javax.swing.JFrame {
     }//GEN-LAST:event_bAbrirActionPerformed
 
     private void b_solucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_solucionActionPerformed
-        if(imgCargada != null){
-            Busqueda b;
-            try {
-                b = new Busqueda(imgCargada);
-                b.solucionar();
-            } catch (Exception ex) {
-                Logger.getLogger(WinMain.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+        Busqueda b;
+        try {
+            b = new Busqueda(panelImg);
+            b.solucionar();
+        } catch (Exception ex) {
+            Logger.getLogger(WinMain.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_b_solucionActionPerformed
 
+    private void jPanel1ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel1ComponentResized
+        panelImg.setBounds(1, 1, jPanel1.getWidth() - 2, jPanel1.getHeight() - 2);
+        panelImg.updateUI();
+        panelImg.setPuntos = 0;
+    }//GEN-LAST:event_jPanel1ComponentResized
+
     private void myInit(){
+        //Crenado panel de imagen
+        panelImg = new PanelImg();
+        panelImg.setBounds(1, 1, jPanel1.getWidth() - 2, jPanel1.getHeight() - 2);
+        panelImg.setOpaque(false);
+        jPanel1.add(panelImg);
+        
         //Filtro jfilechooser
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("Imagenes", "jpg", "png"));
     }
     
-    private BufferedImage imgCargada;
+    private PanelImg panelImg;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAbrir;
     private javax.swing.JButton b_solucion;
-    private javax.swing.JButton jButton1;
     private javax.swing.JFileChooser jFileChooser1;
-    private javax.swing.JLabel l_img;
+    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 }
