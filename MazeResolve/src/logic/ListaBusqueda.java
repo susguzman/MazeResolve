@@ -47,10 +47,10 @@ public class ListaBusqueda {
         if(!lista.isEmpty()){
             Celda c = hash.get(llave);
             
-            System.out.println("Lista AN: " + lista.size());
+            //System.out.println("Lista AN: " + lista.size());
             lista.remove(c);
             hash.remove(llave);
-            System.out.println("Lista DE: " + lista.size());
+            //System.out.println("Lista DE: " + lista.size());
             
             return c;
         }

@@ -11,6 +11,7 @@ import java.util.LinkedList;
  */
 public class Busqueda {
 
+    private PanelImg panel;
     private final BufferedImage imagen;
     private int mObstaculos[][], x1, x2, y1, y2;
     private ListaBusqueda ltsOpen;
@@ -30,6 +31,7 @@ public class Busqueda {
         }
 
         this.imagen = panelImg.imagen;
+        this.panel = panelImg;
 
         double xMul = (double) panelImg.imagen.getWidth() / (double) panelImg.getWidth();
         double yMul = (double) panelImg.imagen.getHeight() / (double) panelImg.getHeight();
@@ -93,7 +95,7 @@ public class Busqueda {
         ltsOpen.add(origen);
 
         //Si la lista esta vacia no hay solucion
-        while (!ltsOpen.esVacia()) {
+        while (!ltsOpen.esVacia() && panel.detener == false) {
             //Get primer elemento de lista abierta y pasar a cerrada
             Celda c = ltsOpen.getMenor();
             ltsClose.add(c);
@@ -144,10 +146,14 @@ public class Busqueda {
             }
         }
         
+        pintarRuta(ltsOpen.getMenor());        
         return false;
     }
 
     public void solucionar() throws Exception {
+        //Detener
+        panel.detener = false;
+        
         //Crear matriz de obstaculos
         crearMatriz();
 

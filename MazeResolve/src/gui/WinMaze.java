@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import logic.Busqueda;
@@ -20,6 +21,7 @@ public class WinMaze extends javax.swing.JFrame {
 
     /**
      * Creates new form WinMain
+     *
      * @param archivo
      * @param tipo
      */
@@ -27,7 +29,7 @@ public class WinMaze extends javax.swing.JFrame {
         initComponents();
         myInit(archivo, tipo);
     }
-    
+
     public WinMaze(String archivo, String tipo) {
         this(new File(archivo), tipo);
     }
@@ -91,10 +93,10 @@ public class WinMaze extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(b_solucion)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -102,15 +104,33 @@ public class WinMaze extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void b_solucionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b_solucionActionPerformed
-        Busqueda b;
-        try {
-            panelImg.imagen = ImageIO.read(file);
-            b = new Busqueda(panelImg);
-            b.solucionar();
-            panelImg.updateUI();
-        } catch (Exception ex) {
-            Logger.getLogger(WinMaze.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        if (inicio == false) {
+            b_solucion.setText("Detener");
+            inicio = true;
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    Busqueda b;
+                    try {
+                        panelImg.imagen = ImageIO.read(file);
+                        b = new Busqueda(panelImg);
+                        b.solucionar();                                           
+                        inicio = false;
+                        b_solucion.setText("Solucionar");
+                        panelImg.updateUI();
+                        JOptionPane.showMessageDialog(yo(), "Terminado :D", "Fin", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        Logger.getLogger(WinMaze.class.getName()).log(Level.SEVERE, null, ex);
+                        JOptionPane.showMessageDialog(yo(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }).start();
+        } else {
+            //Detener
+            inicio = false;
+            panelImg.detener = true;
+            b_solucion.setText("Solucionar");
         }
     }//GEN-LAST:event_b_solucionActionPerformed
 
@@ -120,9 +140,14 @@ public class WinMaze extends javax.swing.JFrame {
         panelImg.setPuntos = 0;
     }//GEN-LAST:event_jPanel1ComponentResized
 
-    private void myInit(File f, String tipo){
+    private JFrame yo() {
+        return this;
+    }
+
+    private void myInit(File f, String tipo) {
         file = f;
-        
+        inicio = false;
+
         //Crenado panel de imagen
         panelImg = new PanelImg();
         panelImg.setBounds(1, 1, jPanel1.getWidth() - 2, jPanel1.getHeight() - 2);
@@ -133,14 +158,15 @@ public class WinMaze extends javax.swing.JFrame {
             Logger.getLogger(WinMaze.class.getName()).log(Level.SEVERE, null, ex);
         }
         jPanel1.add(panelImg);
-        
+
         //Filtro jfilechooser
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("Imagenes", "jpg", "png", "gif", "jpeg"));
     }
-    
+
     private PanelImg panelImg;
     private File file;
-    
+    private boolean inicio;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton b_solucion;
     private javax.swing.JFileChooser jFileChooser1;

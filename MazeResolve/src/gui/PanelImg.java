@@ -18,6 +18,7 @@ public class PanelImg extends JPanel{
     
     public BufferedImage imagen;
     public int x1, x2, y1, y2, setPuntos;
+    public boolean detener = false;
     
     public PanelImg(){
         this(null);
